@@ -11,12 +11,12 @@
       <div class="slider-img" style="background-image: url('{{ asset($slider->image_path) }}'); background-size: cover; background-position: center center;"></div>
       <div class="banner-content">
         <div class="banner-text">
-          <h6>{{ $slider->subtitle }}</h6>
-          <h1 class="mb-5">{!! $slider->title !!}</h1>
-          <p>{{ $slider->description }}</p>
+          <h6>{{ $slider->getTranslation('subtitle', app()->getLocale(), false) }}</h6>
+          <h1 class="mb-5">{!! $slider->getTranslation('title', app()->getLocale(), false) !!}</h1>
+          <p>{{ $slider->getTranslation('description', app()->getLocale(), false) }}</p>
           <div class="btn-box mt-5">
-            <a class="themeht-btn primary-btn" href="{{ $slider->primary_button_url }}">{{ $slider->primary_button_text }}</a>
-            <a class="themeht-btn dark-btn" href="{{ $slider->secondary_button_url }}">{{ $slider->secondary_button_text }}</a>
+            <a class="themeht-btn primary-btn" href="{{ $slider->primary_button_url }}">{{ $slider->getTranslation('primary_button_text', app()->getLocale(), false) }}</a>
+            <a class="themeht-btn dark-btn" href="{{ $slider->secondary_button_url }}">{{ $slider->getTranslation('secondary_button_text', app()->getLocale(), false) }}</a>
           </div>
         </div>
       </div>
@@ -40,13 +40,13 @@
           </div>
           <div class="featured-desc">
             <div class="featured-title">
-              <h4>{{ $feature->title }}</h4>
-              <p>{{ $feature->description }}</p>
+              <h4>{{ $feature->getTranslation('title', app()->getLocale(), false) }}</h4>
+              <p>{{ $feature->getTranslation('description', app()->getLocale(), false) }}</p>
               <a class="ht-link-btn" href="{{ $feature->link_url }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="arr-2" viewBox="0 0 24 24">
                   <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
                 </svg>
-                <span>Read More</span>
+                <span>{{ __('Read More') }}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="arr-1" viewBox="0 0 24 24">
                   <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
                 </svg>
@@ -74,15 +74,15 @@
       <div class="col">
         <div class="marquee-wrap">
           <div class="marquee-text">
-            <span>Laboratory</span>
-            <span>Science</span>
-            <span>Research</span>
-            <span>Laboratory</span>
-            <span>Science</span>
-            <span>Research</span>
-            <span>Laboratory</span>
-            <span>Science</span>
-            <span>Research</span>
+            <span>{{ __('Laboratory') }}</span>
+            <span>{{ __('Science') }}</span>
+            <span>{{ __('Research') }}</span>
+            <span>{{ __('Laboratory') }}</span>
+            <span>{{ __('Science') }}</span>
+            <span>{{ __('Research') }}</span>
+            <span>{{ __('Laboratory') }}</span>
+            <span>{{ __('Science') }}</span>
+            <span>{{ __('Research') }}</span>
           </div>
         </div>
       </div>
@@ -118,9 +118,9 @@
       </div>
       <div class="col-lg-6 col-12 mt-6 mt-lg-0 ps-lg-8">
         <div class="theme-title">
-          <h6>{{ $about->subtitle ?? 'About Us' }}</h6>
-          <h2>{!! $about->title ?? 'Experiment With The Best <span>Lab Test And Service</span>' !!}</h2>
-          <p>{{ $about->description ?? 'With a belief that knowledge is power, we connect our patients directly with their results so they have valuable health information when they need it most.' }}</p>
+          <h6>{{ $about->getTranslation('subtitle', app()->getLocale(), false) ?? __('About Us') }}</h6>
+          <h2>{!! $about->getTranslation('title', app()->getLocale(), false) ?? __('Experiment With The Best <span>Lab Test And Service</span>') !!}</h2>
+          <p>{{ $about->getTranslation('description', app()->getLocale(), false) ?? __('With a belief that knowledge is power, we connect our patients directly with their results so they have valuable health information when they need it most.') }}</p>
         </div>
         <div class="row mt-4 mb-3">
           @php
@@ -160,13 +160,13 @@
                 <img class="rounded-circle" src="{{ asset($about->doctor_image ?? 'images/about-thumb.jpg') }}" alt="...">
               </div>
               <div class="flex-grow-1 ms-3">
-                <h6 class="mb-0">{{ $about->doctor_name ?? 'Dr. Abigail George' }}</h6>
-                <label class="text-theme">{{ $about->doctor_title ?? 'Laboratory Specialist' }}</label>
+                <h6 class="mb-0">{{ $about->getTranslation('doctor_name', app()->getLocale(), false) ?? __('Dr. Abigail George') }}</h6>
+                <label class="text-theme">{{ $about->getTranslation('doctor_title', app()->getLocale(), false) ?? __('Laboratory Specialist') }}</label>
               </div>
             </div>
           </div>
         </div>
-        <a class="themeht-btn primary-btn" href="{{ route('about') }}">More About Us</a>
+        <a class="themeht-btn primary-btn" href="{{ route('about') }}">{{ __('More About Us') }}</a>
       </div>
     </div>
   </div>
@@ -180,8 +180,8 @@
     <div class="row justify-content-center text-center">
       <div class="col-xl-6 col-lg-8 col-md-12">
         <div class="theme-title text-white">
-          <h6>Our Services</h6>
-          <h2>Comprehensive Solutions For <span>Every Challenge.</span></h2>
+          <h6>{{ __('Our Services') }}</h6>
+          <h2>{{ __('Comprehensive Solutions For') }} <span>{{ __('Every Challenge.') }}</span></h2>
         </div>
       </div>
     </div>
@@ -195,21 +195,21 @@
             <div class="swiper-slide">
               <div class="service-item style-2">
                 <div class="service-img">
-                  <img class="img-fluid" src="{{ asset($service->image) }}" alt="{{ $service->title }}">
+                  <img class="img-fluid" src="{{ asset($service->image) }}" alt="{{ $service->getTranslation('title', app()->getLocale(), false) }}">
                   <div class="service-icon">
                     <i class="{{ $service->icon }}"></i>
                   </div>
                 </div>
                 <div class="service-desc">
                   <div class="service-title">
-                    <h4>{{ $service->title }}</h4>
+                    <h4>{{ $service->getTranslation('title', app()->getLocale(), false) }}</h4>
                   </div>
-                  <p>{{ $service->description }}</p>
+                  <p>{{ $service->getTranslation('description', app()->getLocale(), false) }}</p>
                   <a class="ht-link-btn" href="#">
                     <svg xmlns="http://www.w3.org/2000/svg" class="arr-2" viewBox="0 0 24 24">
                       <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
                     </svg>
-                    <span>Read More</span>
+                    <span>{{ __('Read More') }}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="arr-1" viewBox="0 0 24 24">
                       <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
                     </svg>
@@ -246,16 +246,16 @@
             <div class="counter-desc">
               <span class="count-number" data-count="{{ $about->second_section_years ?? 15 }}"></span>
               <span>+</span>
-              <h6>Years of Experience</h6>
+              <h6>{{ __('Years of Experience') }}</h6>
             </div>
           </div>
         </div>
       </div>
       <div class="col-lg-6 col-12 mt-10 mt-lg-0 pe-md-8">
         <div class="theme-title">
-          <h6>{{ $about->second_section_subtitle ?? 'Who We Are' }}</h6>
-          <h2>{!! $about->second_section_title ?? 'Discover Our Commitment to <span>Research Center</span>' !!}</h2>
-          <p>{{ $about->second_section_description ?? 'Delivering cutting-edge scientific services with precise testing, research support, and consultation, committed to excellence and advancement in every project.' }}</p>
+          <h6>{{ $about->getTranslation('second_section_subtitle', app()->getLocale(), false) ?? __('Who We Are') }}</h6>
+          <h2>{!! $about->getTranslation('second_section_title', app()->getLocale(), false) ?? __('Discover Our Commitment to <span>Research Center</span>') !!}</h2>
+          <p>{{ $about->getTranslation('second_section_description', app()->getLocale(), false) ?? __('Delivering cutting-edge scientific services with precise testing, research support, and consultation, committed to excellence and advancement in every project.') }}</p>
         </div>
         <div class="row mt-5 mb-5">
           <div class="col-md-6">
@@ -265,11 +265,11 @@
                   <i class="flaticon flaticon-laboratory"></i>
                 </div>
                 <div class="featured-title">
-                  <h4>{{ $about->second_section_feature1_title ?? 'Medical laboratory Technician' }}</h4>
+                  <h4>{{ $about->getTranslation('second_section_feature1_title', app()->getLocale(), false) ?? __('Medical laboratory Technician') }}</h4>
                 </div>
               </div>
               <div class="featured-desc">
-                <p>{{ $about->second_section_feature1_description ?? 'New evidence has been published on the protein dosing patients.' }}</p>
+                <p>{{ $about->getTranslation('second_section_feature1_description', app()->getLocale(), false) ?? __('New evidence has been published on the protein dosing patients.') }}</p>
               </div>
             </div>
           </div>
@@ -280,16 +280,16 @@
                   <i class="flaticon flaticon-microscope"></i>
                 </div>
                 <div class="featured-title">
-                  <h4>{{ $about->second_section_feature2_title ?? '10+ Quality Research Center' }}</h4>
+                  <h4>{{ $about->getTranslation('second_section_feature2_title', app()->getLocale(), false) ?? __('10+ Quality Research Center') }}</h4>
                 </div>
               </div>
               <div class="featured-desc">
-                <p>{{ $about->second_section_feature2_description ?? 'We believe in fostering collaboration, innovation, and a knowledge.' }}</p>
+                <p>{{ $about->getTranslation('second_section_feature2_description', app()->getLocale(), false) ?? __('We believe in fostering collaboration, innovation, and a knowledge.') }}</p>
               </div>
             </div>
           </div>
         </div>
-        <a class="themeht-btn primary-btn" href="{{ route('about') }}">More About Us</a>
+        <a class="themeht-btn primary-btn" href="{{ route('about') }}">{{ __('More About Us') }}</a>
       </div>
     </div>
   </div>
@@ -303,12 +303,12 @@
       <div class="col">
         <div class="marquee-wrap">
           <div class="marquee-text">
-            <span>Our Specialist</span>
-            <span>Team Member</span>
-            <span>Expert Doctor</span>
-            <span>Our Specialist</span>
-            <span>Team Member</span>
-            <span>Expert Doctor</span>
+            <span>{{ __('Our Specialist') }}</span>
+            <span>{{ __('Team Member') }}</span>
+            <span>{{ __('Expert Doctor') }}</span>
+            <span>{{ __('Our Specialist') }}</span>
+            <span>{{ __('Team Member') }}</span>
+            <span>{{ __('Expert Doctor') }}</span>
           </div>
         </div>
       </div>
@@ -328,7 +328,7 @@
             <div class="swiper-slide">
               <div class="team-member">
                 <div class="team-images">
-                  <img class="img-fluid rounded" src="{{ asset($member->image) }}" alt="{{ $member->name }}">
+                  <img class="img-fluid rounded" src="{{ asset($member->image) }}" alt="{{ $member->getTranslation('name', app()->getLocale(), false) }}">
                   <ul class="social-icons team-social-icon list-inline mb-0">
                     @if($member->facebook)
                     <li>
@@ -355,9 +355,9 @@
                 </div>
                 <div class="team-desc">
                   <h4>
-                    <a href="#">{{ $member->name }}</a>
+                    <a href="#">{{ $member->getTranslation('name', app()->getLocale(), false) }}</a>
                   </h4>
-                  <span>{{ $member->title }}</span>
+                  <span>{{ $member->getTranslation('title', app()->getLocale(), false) }}</span>
                 </div>
               </div>
             </div>
@@ -376,8 +376,8 @@
                   </ul>
                 </div>
                 <div class="team-desc">
-                  <h4><a href="#">Penny Damion</a></h4>
-                  <span>Lab technician</span>
+                  <h4><a href="#">{{ __('Penny Damion') }}</a></h4>
+                  <span>{{ __('Lab technician') }}</span>
                 </div>
               </div>
             </div>
@@ -397,12 +397,12 @@
     <div class="row align-items-end mb-6">
       <div class="col-lg-6 col-md-12">
         <div class="theme-title mb-0">
-          <h6>{{ $appointment_settings->subtitle ?? 'Book An Appointment' }}</h6>
-          <h2>{{ $appointment_settings->title ?? 'Effortless Online Booking for' }}</h2>
+          <h6>{{ $appointment_settings->getTranslation('subtitle', app()->getLocale(), false) ?? __('Book An Appointment') }}</h6>
+          <h2>{{ $appointment_settings->getTranslation('title', app()->getLocale(), false) ?? __('Effortless Online Booking for') }}</h2>
         </div>
       </div>
       <div class="col-lg-5 ms-auto mt-5 mt-lg-0">
-        <p>{{ $appointment_settings->description ?? 'We believe in a future where renewable energy sources play avital role in reducing carbon emissions. we provide a wide range of diagnostic services ranging from complete health check-up packages.' }}</p>
+        <p>{{ $appointment_settings->getTranslation('description', app()->getLocale(), false) ?? __('We believe in a future where renewable energy sources play avital role in reducing carbon emissions. we provide a wide range of diagnostic services ranging from complete health check-up packages.') }}</p>
       </div>
     </div>
     <div class="row">
@@ -412,8 +412,8 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label>Your Name</label>
-                <input id="form_name" type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Enter Your Name" required="required" value="{{ old('name') }}">
+                <label>{{ __('Your Name') }}</label>
+                <input id="form_name" type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="{{ __('Enter Your Name') }}" required="required" value="{{ old('name') }}">
                 @error('name')
                   <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -421,8 +421,8 @@
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label>Email Address</label>
-                <input id="form_email" type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="Enter Email Address" required="required" value="{{ old('email') }}">
+                <label>{{ __('Email Address') }}</label>
+                <input id="form_email" type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="{{ __('Enter Email Address') }}" required="required" value="{{ old('email') }}">
                 @error('email')
                   <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -432,8 +432,8 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label>Phone Number</label>
-                <input id="form_phone" type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="Enter Phone number" required="required" value="{{ old('phone') }}">
+                <label>{{ __('Phone Number') }}</label>
+                <input id="form_phone" type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror" placeholder="{{ __('Enter Phone number') }}" required="required" value="{{ old('phone') }}">
                 <input type="hidden" name="full_phone" id="full_phone">
                 @error('phone')
                   <div class="invalid-feedback">{{ $message }}</div>
@@ -444,8 +444,8 @@
           <div class="row">
             <div class="col-md-12">
               <div class="form-group">
-                <label>Message</label>
-                <textarea id="form_message" name="message" class="form-control @error('message') is-invalid @enderror" placeholder="Write Your Message Here..." rows="4" required="required">{{ old('message') }}</textarea>
+                <label>{{ __('Message') }}</label>
+                <textarea id="form_message" name="message" class="form-control @error('message') is-invalid @enderror" placeholder="{{ __('Write Your Message Here...') }}" rows="4" required="required">{{ old('message') }}</textarea>
                 @error('message')
                   <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -453,7 +453,7 @@
             </div>
             <div class="col-md-12 mt-3">
               <button type="submit" class="themeht-btn primary-btn">
-                Send Message
+                {{ $appointment_settings->getTranslation('button_text', app()->getLocale(), false) ?? __('Send Message') }}
               </button>
             </div>
           </div>
@@ -461,7 +461,7 @@
       </div>
       <div class="col-lg-5 col-md-12 ms-auto mt-5 mt-lg-0">
         <div class="primary-bg p-8 rounded">
-          <h4 class="text-white">Working Hours</h4>
+          <h4 class="text-white">{{ __('Working Hours') }}</h4>
           @php
             $working_hours = $appointment_settings->working_hours ?? [
                 'Mon - Tues' => '09:00AM - 6:00PM',
@@ -473,7 +473,7 @@
           
           @foreach($working_hours as $day => $hours)
           <div class="working-hours-item {{ $loop->last ? 'mb-0 pb-0 border-bottom-0' : '' }}">
-            <span class="working-day">{{ $day }}</span>
+            <span class="working-day">{{ __($day) }}</span>
             <span class="working-time">{{ $hours }}</span>
           </div>
           @endforeach
@@ -490,8 +490,8 @@
     <div class="row justify-content-center text-center">
       <div class="col-xl-6 col-lg-8 col-md-12">
         <div class="theme-title">
-          <h6>{{ $portfolio_heading->subtitle ?? 'Latest Portfolio' }}</h6>
-          <h2>{{ $portfolio_heading->title ?? 'We\'ve Done A Lot\'s, Check' }} <span>{{ $portfolio_heading->title_span ?? 'Our Latest Research' }}</span></h2>
+          <h6>{{ $portfolio_heading->getTranslation('subtitle', app()->getLocale(), false) ?? __('Latest Portfolio') }}</h6>
+          <h2>{{ $portfolio_heading->getTranslation('title', app()->getLocale(), false) ?? __('We\'ve Done A Lot\'s, Check') }} <span>{{ $portfolio_heading->getTranslation('title_span', app()->getLocale(), false) ?? __('Our Latest Research') }}</span></h2>
         </div>
       </div>
     </div>
@@ -505,12 +505,12 @@
             <div class="swiper-slide">
               <div class="portfolio-item">
                 <div class="portfolio-img">
-                  <img class="img-fluid w-100" src="{{ asset($portfolio->image) }}" alt="{{ $portfolio->title }}">
+                  <img class="img-fluid w-100" src="{{ asset($portfolio->image) }}" alt="{{ $portfolio->getTranslation('title', app()->getLocale(), false) }}">
                 </div>
                 <div class="portfolio-desc">
-                  <span>{{ $portfolio->category }}</span>
+                  <span>{{ $portfolio->getTranslation('category', app()->getLocale(), false) }}</span>
                   <h4>
-                    <a href="#">{{ $portfolio->title }}</a>
+                    <a href="#">{{ $portfolio->getTranslation('title', app()->getLocale(), false) }}</a>
                   </h4>
                 </div>
               </div>
@@ -525,8 +525,8 @@
                   <img class="img-fluid w-100" src="{{ asset('images/portfolio/01.jpg') }}" alt="">
                 </div>
                 <div class="portfolio-desc">
-                  <span>DNA</span>
-                  <h4><a href="#">Blood DNA Detect</a></h4>
+                  <span>{{ __('DNA') }}</span>
+                  <h4><a href="#">{{ __('Blood DNA Detect') }}</a></h4>
                 </div>
               </div>
             </div>
@@ -546,8 +546,8 @@
     <div class="row justify-content-center text-center">
       <div class="col-xl-6 col-lg-8 col-md-12">
         <div class="theme-title">
-          <h6>{{ $blog_heading->subtitle ?? 'Recent Articles' }}</h6>
-          <h2>{{ $blog_heading->title ?? 'Innovation in Focus Stories' }} <span>{{ $blog_heading->title_span ?? 'Updated From Lab' }}</span></h2>
+          <h6>{{ $blog_heading->getTranslation('subtitle', app()->getLocale(), false) ?? __('Recent Articles') }}</h6>
+          <h2>{{ $blog_heading->getTranslation('title', app()->getLocale(), false) ?? __('Innovation in Focus Stories') }} <span>{{ $blog_heading->getTranslation('title_span', app()->getLocale(), false) ?? __('Updated From Lab') }}</span></h2>
         </div>
       </div>
     </div>
@@ -556,7 +556,7 @@
       <div class="col-lg-4 col-md-12 {{ $loop->index > 0 ? 'mt-6 mt-lg-0' : '' }}">
         <div class="post-card style-1">
           <div class="post-image">
-            <img class="img-fluid w-100" src="{{ asset($post->featured_image) }}" alt="{{ $post->title }}">
+            <img class="img-fluid w-100" src="{{ asset($post->featured_image) }}" alt="{{ $post->getTranslation('title', app()->getLocale(), false) }}">
           </div>
           <div class="post-desc">
             <div class="post-bottom">
@@ -565,20 +565,20 @@
                   <i class="bi bi-calendar3"></i>{{ $post->created_at ? $post->created_at->format('d F, Y') : date('d F, Y') }}
                 </li>
                 <li class="list-inline-item">
-                  <i class="bi bi-tag"></i> {{ $post->category ? $post->category->name : 'General' }}
+                  <i class="bi bi-tag"></i> {{ $post->category ? $post->category->getTranslation('name', app()->getLocale(), false) : __('General') }}
                 </li>
               </ul>
             </div>
             <div class="post-title">
               <h4>
-                <a href="#">{{ $post->title }}</a>
+                <a href="#">{{ $post->getTranslation('title', app()->getLocale(), false) }}</a>
               </h4>
             </div>
             <a class="ht-link-btn" href="#">
               <svg xmlns="http://www.w3.org/2000/svg" class="arr-2" viewBox="0 0 24 24">
                 <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
               </svg>
-              <span>Read More</span>
+              <span>{{ __('Read More') }}</span>
               <svg xmlns="http://www.w3.org/2000/svg" class="arr-1" viewBox="0 0 24 24">
                 <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
               </svg>
@@ -602,20 +602,20 @@
                   <i class="bi bi-calendar3"></i>10 March, 2025
                 </li>
                 <li class="list-inline-item">
-                  <i class="bi bi-tag"></i> Biochemistry
+                  <i class="bi bi-tag"></i> {{ __('Biochemistry') }}
                 </li>
               </ul>
             </div>
             <div class="post-title">
               <h4>
-                <a href="#">The Role of Medical Laboratories in Infectious Disease Testing</a>
+                <a href="#">{{ __('The Role of Medical Laboratories in Infectious Disease Testing') }}</a>
               </h4>
             </div>
             <a class="ht-link-btn" href="#">
               <svg xmlns="http://www.w3.org/2000/svg" class="arr-2" viewBox="0 0 24 24">
                 <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
               </svg>
-              <span>Read More</span>
+              <span>{{ __('Read More') }}</span>
               <svg xmlns="http://www.w3.org/2000/svg" class="arr-1" viewBox="0 0 24 24">
                 <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
               </svg>

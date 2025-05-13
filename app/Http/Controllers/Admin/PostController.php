@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Category;
+use App\Models\Language;
 use Illuminate\Support\Str;
 
 class PostController extends Controller
@@ -28,7 +29,8 @@ class PostController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('admin.posts.create', compact('categories'));
+        $languages = active_languages();
+        return view('admin.posts.create', compact('categories', 'languages'));
     }
 
     /**
@@ -36,43 +38,78 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'seo_title' => 'nullable|string|max:255',
-            'seo_description' => 'nullable|string',
+        $languages = active_languages();
+        $defaultLanguage = default_language();
+        
+        $rules = [];
+        foreach ($languages as $language) {
+            $isRequired = $language->is_default;
+            $rules["title.{$language->code}"] = $isRequired ? 'required|string|max:255' : 'nullable|string|max:255';
+            $rules["excerpt.{$language->code}"] = 'nullable|string';
+            $rules["content.{$language->code}"] = $isRequired ? 'required|string' : 'nullable|string';
+            $rules["seo_title.{$language->code}"] = 'nullable|string|max:255';
+            $rules["seo_description.{$language->code}"] = 'nullable|string';
+            $rules["author_name.{$language->code}"] = 'nullable|string|max:255';
+        }
+        
+        $rules = array_merge($rules, [
             'category_id' => 'exists:categories,id',
-            'excerpt' => 'nullable|string',
-            'content' => 'required|string',
             'featured_image' => 'required|string|max:255',
             'active' => 'boolean',
-            'author_name' => 'nullable|string|max:255',
             'author_link' => 'nullable|string|max:255',
         ]);
         
-        // Generate slug from title
-        $slug = Str::slug($request->title);
-        $originalSlug = $slug;
-        $count = 1;
+        $request->validate($rules);
+        
+        $post = new Post();
+        
+        // Set translatable fields
+        foreach ($languages as $language) {
+            $locale = $language->code;
+            
+            if (isset($request->title[$locale])) {
+                $post->setTranslation('title', $locale, $request->title[$locale]);
+            }
+            
+            if (isset($request->excerpt[$locale])) {
+                $post->setTranslation('excerpt', $locale, $request->excerpt[$locale]);
+            }
+            
+            if (isset($request->content[$locale])) {
+                $post->setTranslation('content', $locale, $request->content[$locale]);
+            }
+            
+            if (isset($request->seo_title[$locale])) {
+                $post->setTranslation('seo_title', $locale, $request->seo_title[$locale]);
+            }
+            
+            if (isset($request->seo_description[$locale])) {
+                $post->setTranslation('seo_description', $locale, $request->seo_description[$locale]);
+            }
+            
+            if (isset($request->author_name[$locale])) {
+                $post->setTranslation('author_name', $locale, $request->author_name[$locale]);
+            }
+        }
+        
+        // Generate slug from default language title
+        $defaultLocale = $defaultLanguage->code;
+        $title = $request->title[$defaultLocale];
+        $slug = Str::slug($title);
         
         // Ensure the slug is unique
+        $originalSlug = $slug;
+        $count = 1;
         while (Post::where('slug', $slug)->exists()) {
             $slug = $originalSlug . '-' . $count;
             $count++;
         }
         
-        // Create post
-        $post = new Post();
-        $post->title = $request->title;
-        $post->seo_title = $request->seo_title;
-        $post->seo_description = $request->seo_description;
         $post->slug = $slug;
-        $post->excerpt = $request->excerpt;
-        $post->content = $request->content;
-        $post->featured_image = $request->featured_image;
         $post->category_id = $request->category_id;
-        $post->active = $request->has('active') ? 1 : 0;
-        $post->author_name = $request->author_name; 
+        $post->featured_image = $request->featured_image;
         $post->author_link = $request->author_link;
+        $post->active = $request->has('active') ? 1 : 0;
         $post->save();
         
         return redirect()->route('posts.index')
@@ -85,7 +122,8 @@ class PostController extends Controller
     public function edit(Post $post)
     {
         $categories = Category::all();
-        return view('admin.posts.edit', compact('post', 'categories'));
+        $languages = active_languages();
+        return view('admin.posts.edit', compact('post', 'categories', 'languages'));
     }
 
     /**
@@ -93,26 +131,69 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'seo_title' => 'nullable|string|max:255',
-            'seo_description' => 'nullable|string',
+        $languages = active_languages();
+        $defaultLanguage = default_language();
+        
+        $rules = [];
+        foreach ($languages as $language) {
+            $isRequired = $language->is_default;
+            $rules["title.{$language->code}"] = $isRequired ? 'required|string|max:255' : 'nullable|string|max:255';
+            $rules["excerpt.{$language->code}"] = 'nullable|string';
+            $rules["content.{$language->code}"] = $isRequired ? 'required|string' : 'nullable|string';
+            $rules["seo_title.{$language->code}"] = 'nullable|string|max:255';
+            $rules["seo_description.{$language->code}"] = 'nullable|string';
+            $rules["author_name.{$language->code}"] = 'nullable|string|max:255';
+        }
+        
+        $rules = array_merge($rules, [
             'category_id' => 'exists:categories,id',
-            'excerpt' => 'nullable|string',
-            'content' => 'required|string',
             'featured_image' => 'required|string|max:255',
             'active' => 'boolean',
-            'author_name' => 'nullable|string|max:255',
             'author_link' => 'nullable|string|max:255',
         ]);
         
-        // If title changed, update slug
-        if ($post->title != $request->title) {
-            $slug = Str::slug($request->title);
-            $originalSlug = $slug;
-            $count = 1;
+        $request->validate($rules);
+        
+        // Update translatable fields
+        foreach ($languages as $language) {
+            $locale = $language->code;
+            
+            if (isset($request->title[$locale])) {
+                $post->setTranslation('title', $locale, $request->title[$locale]);
+            }
+            
+            if (isset($request->excerpt[$locale])) {
+                $post->setTranslation('excerpt', $locale, $request->excerpt[$locale]);
+            }
+            
+            if (isset($request->content[$locale])) {
+                $post->setTranslation('content', $locale, $request->content[$locale]);
+            }
+            
+            if (isset($request->seo_title[$locale])) {
+                $post->setTranslation('seo_title', $locale, $request->seo_title[$locale]);
+            }
+            
+            if (isset($request->seo_description[$locale])) {
+                $post->setTranslation('seo_description', $locale, $request->seo_description[$locale]);
+            }
+            
+            if (isset($request->author_name[$locale])) {
+                $post->setTranslation('author_name', $locale, $request->author_name[$locale]);
+            }
+        }
+        
+        // If title changed in default language, update slug
+        $defaultLocale = $defaultLanguage->code;
+        $newTitle = $request->title[$defaultLocale];
+        $oldTitle = $post->getTranslation('title', $defaultLocale, false);
+        
+        if ($newTitle != $oldTitle) {
+            $slug = Str::slug($newTitle);
             
             // Ensure the slug is unique
+            $originalSlug = $slug;
+            $count = 1;
             while (Post::where('slug', $slug)->where('id', '!=', $post->id)->exists()) {
                 $slug = $originalSlug . '-' . $count;
                 $count++;
@@ -121,17 +202,10 @@ class PostController extends Controller
             $post->slug = $slug;
         }
         
-        // Update post
-        $post->title = $request->title;
-        $post->seo_title = $request->seo_title;
-        $post->seo_description = $request->seo_description;
-        $post->excerpt = $request->excerpt;
-        $post->content = $request->content;
-        $post->featured_image = $request->featured_image;
         $post->category_id = $request->category_id;
+        $post->featured_image = $request->featured_image;
+        $post->author_link = $request->author_link;
         $post->active = $request->has('active') ? 1 : 0;
-        $post->author_name = $request->author_name; 
-        $post->author_link = $request->author_link; 
         $post->save();
         
         return redirect()->route('posts.index')

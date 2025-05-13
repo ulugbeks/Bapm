@@ -20,98 +20,196 @@ use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\AboutUsController;
 use App\Http\Controllers\Admin\ContactPageSeoController;
 use App\Http\Controllers\Admin\HomePageSeoController;
+use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\SectionHeadingController;
 use App\Http\Controllers\ImageUploadController;
+use App\Models\Language;
 
-// Front-end routes
-Route::get('/', [PageController::class, 'home'])->name('home');
-Route::get('/about-us', [PageController::class, 'about'])->name('about');
-Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
+// Глобальное применение middleware setlocale для всех маршрутов
+Route::middleware(['setlocale'])->group(function () {
 
-// Home Page SEO
-Route::get('home-page-seo', [HomePageSeoController::class, 'edit'])->name('home-page-seo.edit');
-Route::put('home-page-seo', [HomePageSeoController::class, 'update'])->name('home-page-seo.update');
+    // Стандартные маршруты (без префикса локали)
+    Route::get('/', [PageController::class, 'home'])->name('home');
+    Route::get('/about-us', [PageController::class, 'about'])->name('about');
+    Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+    Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
-// Contact Page SEO
-Route::get('contact-page-seo', [ContactPageSeoController::class, 'edit'])->name('contact-page-seo.edit');
-Route::put('contact-page-seo', [ContactPageSeoController::class, 'update'])->name('contact-page-seo.update');
+    // Маршруты блога
+    Route::prefix('blog')->group(function () {
+        Route::get('/', [BlogController::class, 'index'])->name('blog.index');
+        Route::get('/{slug}', [BlogController::class, 'show'])->name('blog.show');
+        Route::get('/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
+    });
 
-Route::post('/image-upload-direct', [App\Http\Controllers\ImageUploadController::class, 'uploadDirect'])->name('image.upload.direct');
+    // SEO маршруты
+    Route::get('home-page-seo', [HomePageSeoController::class, 'edit'])->name('home-page-seo.edit');
+    Route::put('home-page-seo', [HomePageSeoController::class, 'update'])->name('home-page-seo.update');
+    Route::get('contact-page-seo', [ContactPageSeoController::class, 'edit'])->name('contact-page-seo.edit');
+    Route::put('contact-page-seo', [ContactPageSeoController::class, 'update'])->name('contact-page-seo.update');
 
-// Blog routes
-Route::prefix('blog')->group(function () {
-    Route::get('/', [BlogController::class, 'index'])->name('blog.index');
-    Route::get('/{slug}', [BlogController::class, 'show'])->name('blog.show');
-    Route::get('/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
+    // Загрузка изображений
+    Route::post('/image-upload-direct', [ImageUploadController::class, 'uploadDirect'])->name('image.upload.direct');
+
+
+
+    Route::get('language/{locale}', function ($locale) {
+        $language = Language::where('code', $locale)
+                           ->where('active', true)
+                           ->first();
+        
+        if ($language) {
+            session(['locale' => $locale]);
+            App::setLocale($locale); // Explicitly set locale right now
+            session()->save(); // Force session to be saved
+            
+            // Log for debugging
+            \Log::info('Language switched', [
+                'locale' => $locale,
+                'session_locale' => session('locale'),
+                'app_locale' => app()->getLocale()
+            ]);
+        }
+        
+        // Redirect with a unique timestamp to prevent caching
+        return redirect()->back()->withInput(['_' => time()]);
+    })->name('language.switch');
+
+
+
+    // Add to web.php
+    Route::get('/locale-debug', function () {
+        $sessionLocale = session('locale');
+        $appLocale = app()->getLocale();
+        
+        // Try setting a new locale
+        $newLocale = $appLocale === 'en' ? 'lv' : 'en';
+        session(['locale' => $newLocale]);
+        app()->setLocale($newLocale);
+        
+        return [
+            'original_session_locale' => $sessionLocale,
+            'original_app_locale' => $appLocale,
+            'new_session_locale' => session('locale'),
+            'new_app_locale' => app()->getLocale(),
+        ];
+    });
+
+
+    Route::get('/language-test', function () {
+        return view('language-test');
+    })->name('language.test');
+        
+
+
+
+
+    // Переключение языка
+    Route::get('language/{locale}', function ($locale) {
+        $language = Language::where('code', $locale)
+                           ->where('active', true)
+                           ->first();
+        
+        if ($language) {
+            session(['locale' => $locale]);
+        }
+        
+        return redirect()->back();
+    })->name('language.switch');
+
+    // Маршруты для версий с префиксом локали
+    Route::prefix('{locale}')->where(['locale' => '[a-zA-Z]{2}'])->group(function () {
+        Route::get('/', [PageController::class, 'home'])->name('localized.home');
+        Route::get('/about-us', [PageController::class, 'about'])->name('localized.about');
+        Route::get('/contact', [ContactController::class, 'index'])->name('localized.contact');
+        Route::post('/contact', [ContactController::class, 'submit'])->name('localized.contact.submit');
+        
+        // Локализованные маршруты блога
+        Route::prefix('blog')->group(function () {
+            Route::get('/', [BlogController::class, 'index'])->name('localized.blog.index');
+            Route::get('/{slug}', [BlogController::class, 'show'])->name('localized.blog.show');
+            Route::get('/category/{slug}', [BlogController::class, 'category'])->name('localized.blog.category');
+        });
+    });
+    
+    // Подписка на рассылку
+    if (class_exists('App\Http\Controllers\NewsletterController')) {
+        Route::post('/newsletter-subscribe', [App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+    }
 });
 
-// Admin routes
+// Админские маршруты
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
     
-    // Slider management
+    // Управление слайдерами
     Route::resource('sliders', SliderController::class);
     
-    // Feature management
+    // Управление особенностями
     Route::resource('features', FeatureController::class);
     
-    // About management
+    // Управление разделом "О нас" (AboutController)
     Route::get('about', [AboutController::class, 'edit'])->name('about.edit');
     Route::put('about', [AboutController::class, 'update'])->name('about.update');
     
-    // Service management
+    // Управление разделом "О нас" (AboutUsController)
+    Route::get('aboutus', [AboutUsController::class, 'edit'])->name('aboutus.edit');
+    Route::put('aboutus', [AboutUsController::class, 'update'])->name('aboutus.update');
+    
+    // Управление услугами
     Route::resource('services', ServiceController::class);
     
-    // Blog management
+    // Управление блогом
     Route::resource('posts', PostController::class);
     Route::resource('categories', CategoryController::class);
     
-    // Timeline management
+    // Управление временной шкалой
     Route::resource('timeline', TimelineController::class);
     
-    // Contact management
+    // Управление контактами
     Route::resource('contact-locations', ContactLocationController::class);
     Route::get('contacts', [ContactController::class, 'adminIndex'])->name('admin.contacts');
+    Route::get('admin/contacts/{id}', [ContactController::class, 'show'])->name('admin.contacts.show');
+    Route::put('admin/contacts/{id}/mark-as-read', [ContactController::class, 'markAsRead'])->name('admin.contacts.mark-as-read');
+    Route::delete('admin/contacts/{id}', [ContactController::class, 'destroy'])->name('admin.contacts.destroy');
     
-    // Settings management
+    // Управление настройками
     Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
     Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
 
-    // Team management
+    // Управление командой
     Route::resource('team', TeamController::class)->parameters([
         'team' => 'team'
     ])->except(['show']);
     Route::resource('portfolio', PortfolioController::class)->except(['show']);
 
-    // Appointment settings
+    // Настройки встреч
     Route::get('appointment', [AppointmentSettingController::class, 'edit'])->name('appointment.edit');
     Route::put('appointment', [AppointmentSettingController::class, 'update'])->name('appointment.update');
 
-    // Contact management
-    Route::get('admin/contacts', [ContactController::class, 'adminIndex'])->name('admin.contacts');
-    Route::get('admin/contacts/{id}', [ContactController::class, 'show'])->name('admin.contacts.show');
-    Route::put('admin/contacts/{id}/mark-as-read', [ContactController::class, 'markAsRead'])->name('admin.contacts.mark-as-read');
-    Route::delete('admin/contacts/{id}', [ContactController::class, 'destroy'])->name('admin.contacts.destroy');
-
-    Route::get('aboutus', [AboutUsController::class, 'edit'])->name('aboutus.edit');
-    Route::put('aboutus', [AboutUsController::class, 'update'])->name('aboutus.update');
-
-    // Home Page SEO
+    // SEO для домашней страницы
     Route::get('home-page-seo', [HomePageSeoController::class, 'edit'])->name('home-page-seo.edit');
     Route::put('home-page-seo', [HomePageSeoController::class, 'update'])->name('home-page-seo.update');
 
-    // Contact Page SEO
+    // SEO для страницы контактов
     Route::get('contact-page-seo', [ContactPageSeoController::class, 'edit'])->name('contact-page-seo.edit');
     Route::put('contact-page-seo', [ContactPageSeoController::class, 'update'])->name('contact-page-seo.update');
 
-    // Section Headings
+    // Заголовки разделов
     Route::get('section-headings', [SectionHeadingController::class, 'edit'])->name('section-headings.edit');
     Route::put('section-headings', [SectionHeadingController::class, 'update'])->name('section-headings.update');
+
+    // Панель управления языками
+    Route::get('languages/dashboard', [LanguageController::class, 'dashboard'])->name('languages.dashboard');
+    
+    // Просмотр неполных переводов для типа модели
+    Route::get('languages/incomplete/{model}/{language}', [LanguageController::class, 'incompleteTranslations'])->name('languages.incomplete');
+    
+    // Копирование переводов с языка по умолчанию на целевой язык
+    Route::get('languages/copy-from-default/{target_language}', [LanguageController::class, 'copyFromDefault'])->name('languages.copy-from-default');
+
+    // Управление языками
+    Route::resource('languages', LanguageController::class);
 });
 
-
-Route::post('/newsletter-subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
-
-// Auth routes
+// Аутентификация
 require __DIR__.'/auth.php';

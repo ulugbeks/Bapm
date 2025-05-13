@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <!-- resources/views/layouts/app.blade.php (update the head section) -->
 <head>
     <meta charset="utf-8">
@@ -9,43 +9,64 @@
         $homePageSeo = App\Models\HomePageSeo::first();
         @endphp
         <meta name="keywords" content="{{ $settings->meta_keywords ?? 'laboratory, science, research' }}" />
-        <meta name="description" content="{{ $homePageSeo->seo_description ?? $settings->meta_description ?? 'Laboratory & Science Research' }}" />
-        <title>{{ $homePageSeo->seo_title ?? $settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research' }} - Home</title>
+        <meta name="description" content="{{ $homePageSeo ? $homePageSeo->getTranslation('seo_description', app()->getLocale(), false) : ($settings->meta_description ?? 'Laboratory & Science Research') }}" />
+        <title>{{ $homePageSeo ? $homePageSeo->getTranslation('seo_title', app()->getLocale(), false) : ($settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research') }} - {{ __('Home') }}</title>
     @elseif(Route::is('about'))
         @php
         $aboutPage = App\Models\AboutUs::first();
         @endphp
         <meta name="keywords" content="{{ $settings->meta_keywords ?? 'laboratory, science, research' }}" />
-        <meta name="description" content="{{ $aboutPage->seo_description ?? $settings->meta_description ?? 'Laboratory & Science Research' }}" />
-        <title>{{ $aboutPage->seo_title ?? $settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research' }} - About Us</title>
+        <meta name="description" content="{{ $aboutPage ? $aboutPage->getTranslation('seo_description', app()->getLocale(), false) : ($settings->meta_description ?? 'Laboratory & Science Research') }}" />
+        <title>{{ $aboutPage ? $aboutPage->getTranslation('seo_title', app()->getLocale(), false) : ($settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research') }} - {{ __('About Us') }}</title>
     @elseif(Route::is('contact'))
         @php
         $contactPageSeo = App\Models\ContactPageSeo::first();
         @endphp
         <meta name="keywords" content="{{ $settings->meta_keywords ?? 'laboratory, science, research' }}" />
-        <meta name="description" content="{{ $contactPageSeo->seo_description ?? $settings->meta_description ?? 'Laboratory & Science Research' }}" />
-        <title>{{ $contactPageSeo->seo_title ?? $settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research' }} - Contact</title>
+        <meta name="description" content="{{ $contactPageSeo ? $contactPageSeo->getTranslation('seo_description', app()->getLocale(), false) : ($settings->meta_description ?? 'Laboratory & Science Research') }}" />
+        <title>{{ $contactPageSeo ? $contactPageSeo->getTranslation('seo_title', app()->getLocale(), false) : ($settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research') }} - {{ __('Contact') }}</title>
     @elseif(Route::is('blog.show') && isset($post))
-        <meta name="keywords" content="{{ $post->category->name ?? '' }}, {{ $settings->meta_keywords ?? 'laboratory, science, research' }}" />
-        <meta name="description" content="{{ $post->seo_description ?? $post->excerpt ?? $settings->meta_description ?? 'Laboratory & Science Research' }}" />
-        <title>{{ $post->seo_title ?? $post->title ?? $settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research' }}</title>
+        <meta name="keywords" content="{{ isset($post->category) ? $post->category->getTranslation('name', app()->getLocale(), false) : '' }}, {{ $settings->meta_keywords ?? 'laboratory, science, research' }}" />
+        <meta name="description" content="{{ $post ? $post->getTranslation('seo_description', app()->getLocale(), false) ?? $post->getTranslation('excerpt', app()->getLocale(), false) : ($settings->meta_description ?? 'Laboratory & Science Research') }}" />
+        <title>{{ $post ? $post->getTranslation('seo_title', app()->getLocale(), false) ?? $post->getTranslation('title', app()->getLocale(), false) : ($settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research') }}</title>
     @elseif(Route::is('blog.index'))
-        <meta name="keywords" content="blog, articles, {{ $settings->meta_keywords ?? 'laboratory, science, research' }}" />
-        <meta name="description" content="Latest articles and research updates {{ $settings->meta_description ?? 'from our Laboratory & Science Research center' }}" />
-        <title>Blog - {{ $settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research' }}</title>
+        <meta name="keywords" content="{{ __('blog') }}, {{ __('articles') }}, {{ $settings->meta_keywords ?? 'laboratory, science, research' }}" />
+        <meta name="description" content="{{ __('Latest articles and research updates') }} {{ $settings->meta_description ?? __('from our Laboratory & Science Research center') }}" />
+        <title>{{ __('Blog') }} - {{ $settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research' }}</title>
     @elseif(Route::is('blog.category') && isset($category))
-        <meta name="keywords" content="{{ $category->name }}, blog, {{ $settings->meta_keywords ?? 'laboratory, science, research' }}" />
-        <meta name="description" content="Articles in {{ $category->name }} category {{ $settings->meta_description ?? 'from our Laboratory & Science Research center' }}" />
-        <title>{{ $category->name }} - Blog - {{ $settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research' }}</title>
+        <meta name="keywords" content="{{ $category->getTranslation('name', app()->getLocale(), false) }}, {{ __('blog') }}, {{ $settings->meta_keywords ?? 'laboratory, science, research' }}" />
+        <meta name="description" content="{{ __('Articles in') }} {{ $category->getTranslation('name', app()->getLocale(), false) }} {{ __('category') }} {{ $settings->meta_description ?? __('from our Laboratory & Science Research center') }}" />
+        <title>{{ $category->getTranslation('name', app()->getLocale(), false) }} - {{ __('Blog') }} - {{ $settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research' }}</title>
     @else
         <meta name="keywords" content="{{ $settings->meta_keywords ?? 'laboratory, science, research' }}" />
         <meta name="description" content="{{ $settings->meta_description ?? 'Laboratory & Science Research' }}" />
-        <title>{{ $settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research' }} - @yield('title', 'Home')</title>
+        <title>{{ $settings->meta_title ?? $settings->site_title ?? 'Laboratory & Science Research' }} - @yield('title', __('Home'))</title>
     @endif
     
     <meta name="author" content="www.bapm.eu" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <!-- Hreflang tags for SEO -->
+    @php
+    $languages = App\Models\Language::where('active', 1)->get();
+    $defaultLanguage = App\Models\Language::where('is_default', 1)->first();
+    $currentRoute = Route::currentRouteName();
+    $routeParams = Route::current() ? Route::current()->parameters() : [];
+    @endphp
+
+    @foreach($languages as $language)
+        @if($language->is_default)
+            <link rel="alternate" hreflang="x-default" href="{{ url(Request::path() === app()->getLocale() ? '' : Request::path()) }}" />
+            <link rel="alternate" hreflang="{{ $language->code }}" href="{{ url(Request::path() === app()->getLocale() ? '' : Request::path()) }}" />
+        @else
+            @if($currentRoute)
+                <link rel="alternate" hreflang="{{ $language->code }}" href="{{ route($currentRoute, array_merge(['locale' => $language->code], $routeParams)) }}" />
+            @else
+                <link rel="alternate" hreflang="{{ $language->code }}" href="{{ url($language->code . '/' . (Request::path() === app()->getLocale() ? '' : substr(Request::path(), strlen(app()->getLocale()) + 1))) }}" />
+            @endif
+        @endif
+    @endforeach
 
     <!-- favicon icon -->
     <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}" />
@@ -79,6 +100,31 @@
           background-image: url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/img/flags@2x.png");
         }
       }
+      
+      /* Language switcher styles */
+      .language-switcher {
+        margin-left: 20px;
+        display: flex;
+        align-items: center;
+      }
+      
+      .language-switcher a {
+        display: inline-block;
+        padding: 5px 10px;
+        color: #fff;
+        text-decoration: none;
+        margin-right: 5px;
+        border-radius: 3px;
+      }
+      
+      .language-switcher a.active {
+        background-color: rgba(255, 255, 255, 0.2);
+        font-weight: bold;
+      }
+      
+      .language-switcher a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
     </style>
 </head>
 
@@ -107,6 +153,8 @@
 
         <!-- header start -->
         @include('layouts.partials.header')
+        
+        
         <!-- header end -->
 
         <!-- content start -->
@@ -149,43 +197,48 @@
       document.addEventListener('DOMContentLoaded', function() {
         // Initialize the telephone input
         var phoneInput = document.querySelector("#form_phone");
-        var iti = window.intlTelInput(phoneInput, {
-          utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js",
-          separateDialCode: true,
-          initialCountry: "auto",
-          geoIpLookup: function(callback) {
-            fetch("https://ipapi.co/json")
-              .then(function(res) { return res.json(); })
-              .then(function(data) { callback(data.country_code); })
-              .catch(function() { callback("us"); });
-          },
-          preferredCountries: ["us", "gb", "ca", "au"],
-          formatOnDisplay: true
-        });
-        
-        // Store the full phone number with country code when submitting the form
-        document.getElementById('contact-form').addEventListener('submit', function(e) {
-          var fullNumber = iti.getNumber();
-          document.getElementById('full_phone').value = fullNumber;
+        if (phoneInput) {
+          var iti = window.intlTelInput(phoneInput, {
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js",
+            separateDialCode: true,
+            initialCountry: "auto",
+            geoIpLookup: function(callback) {
+              fetch("https://ipapi.co/json")
+                .then(function(res) { return res.json(); })
+                .then(function(data) { callback(data.country_code); })
+                .catch(function() { callback("us"); });
+            },
+            preferredCountries: ["us", "gb", "ca", "au"],
+            formatOnDisplay: true
+          });
           
-          // Validate phone number
-          if (!iti.isValidNumber()) {
-            e.preventDefault();
-            phoneInput.classList.add('is-invalid');
-            
-            // Create or update error message
-            var errorDiv = phoneInput.nextElementSibling;
-            if (!errorDiv || !errorDiv.classList.contains('invalid-feedback')) {
-              errorDiv = document.createElement('div');
-              errorDiv.className = 'invalid-feedback';
-              phoneInput.parentNode.insertBefore(errorDiv, phoneInput.nextSibling);
-            }
-            
-            errorDiv.innerText = 'Please enter a valid phone number';
-          } else {
-            phoneInput.classList.remove('is-invalid');
+          // Store the full phone number with country code when submitting the form
+          var contactForm = document.getElementById('contact-form');
+          if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+              var fullNumber = iti.getNumber();
+              document.getElementById('full_phone').value = fullNumber;
+              
+              // Validate phone number
+              if (!iti.isValidNumber()) {
+                e.preventDefault();
+                phoneInput.classList.add('is-invalid');
+                
+                // Create or update error message
+                var errorDiv = phoneInput.nextElementSibling;
+                if (!errorDiv || !errorDiv.classList.contains('invalid-feedback')) {
+                  errorDiv = document.createElement('div');
+                  errorDiv.className = 'invalid-feedback';
+                  phoneInput.parentNode.insertBefore(errorDiv, phoneInput.nextSibling);
+                }
+                
+                errorDiv.innerText = '{{ __("Please enter a valid phone number") }}';
+              } else {
+                phoneInput.classList.remove('is-invalid');
+              }
+            });
           }
-        });
+        }
       });
     </script>
 </body>

@@ -34,6 +34,9 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             // Таблица постов может не существовать еще
         }
+
+        // Add languages data
+        $languages = \App\Models\Language::where('active', true)->get();
         
         return view('admin.dashboard', compact(
             'total_posts',
@@ -42,7 +45,8 @@ class AdminController extends Controller
             'total_sliders',
             'total_services',
             'latest_messages',
-            'latest_posts'
+            'latest_posts',
+            'languages'
         ));
     }
 }

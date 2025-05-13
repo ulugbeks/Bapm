@@ -210,6 +210,31 @@
               </li>
             </ul>
           </li>
+
+          <!-- Language Management Menu Toggle -->
+          <li class="nav-item {{ request()->routeIs('languages.*') ? 'menu-open' : '' }}">
+              <a href="#" class="nav-link {{ request()->routeIs('languages.*') ? 'active' : '' }}">
+                  <i class="nav-icon fas fa-language"></i>
+                  <p>
+                      Languages
+                      <i class="right fas fa-angle-left"></i>
+                  </p>
+              </a>
+              <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                      <a href="{{ route('languages.index') }}" class="nav-link {{ request()->routeIs('languages.index') ? 'active' : '' }}">
+                          <i class="far fa-circle nav-icon"></i>
+                          <p>Manage Languages</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{{ route('languages.dashboard') }}" class="nav-link {{ request()->routeIs('languages.dashboard') ? 'active' : '' }}">
+                          <i class="far fa-circle nav-icon"></i>
+                          <p>Translation Dashboard</p>
+                      </a>
+                  </li>
+              </ul>
+          </li>
           
           <!-- Settings -->
           <li class="nav-item">

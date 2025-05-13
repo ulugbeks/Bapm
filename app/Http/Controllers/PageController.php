@@ -15,6 +15,7 @@ use App\Models\TeamMember;
 use App\Models\Portfolio;
 use App\Models\SectionHeading; 
 use App\Models\AppointmentSetting;
+use App\Models\HomePageSeo;
 
 class PageController extends Controller
 {
@@ -27,6 +28,9 @@ class PageController extends Controller
         $team_members = TeamMember::where('active', 1)->orderBy('order')->get();
         $portfolios = Portfolio::where('active', 1)->orderBy('order')->get();
         $appointment_settings = AppointmentSetting::first();
+
+        // Get SEO data
+        $seo = HomePageSeo::first();
 
         $recent_posts = [];
         try {
@@ -74,7 +78,8 @@ class PageController extends Controller
             'portfolios',
             'appointment_settings',
             'portfolio_heading',
-            'blog_heading'
+            'blog_heading',
+            'seo'
         ));
 
         $team_members = [
@@ -196,5 +201,17 @@ class PageController extends Controller
             'team_members',
             'portfolios'
         ));
+    }
+
+    public function contact()
+    {
+        $locations = ContactLocation::where('active', 1)->get();
+        $services = Service::where('active', 1)->orderBy('title')->get();
+        $settings = Setting::first();
+        
+        // Get SEO data
+        $seo = ContactPageSeo::first();
+        
+        return view('pages.contact', compact('locations', 'services', 'settings', 'seo'));
     }
 }

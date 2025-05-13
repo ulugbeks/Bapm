@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class About extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     protected $fillable = [
         'title',
@@ -29,5 +30,20 @@ class About extends Model
         'second_section_feature1_description',
         'second_section_feature2_title',
         'second_section_feature2_description',
+    ];
+
+    public $translatable = [
+        'title',
+        'subtitle',
+        'description',
+        'doctor_name',
+        'doctor_title',
+        'second_section_subtitle',
+        'second_section_title',
+        'second_section_description',
+        'second_section_feature1_title',
+        'second_section_feature1_description',
+        'second_section_feature2_title',
+        'second_section_feature2_description'
     ];
 }

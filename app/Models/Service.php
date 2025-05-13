@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Service extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     protected $fillable = [
         'title',
@@ -17,5 +18,12 @@ class Service extends Model
         'icon',
         'order',
         'active',
+    ];
+
+    // Add the translatable fields
+    public $translatable = [
+        'title',
+        'description',
+        'content'
     ];
 }

@@ -30,62 +30,129 @@
             @csrf
             <div class="row">
                 <div class="col-md-8">
-                    <div class="form-group">
-                        <label for="title">Post Title</label>
-                        <input type="text" name="title" id="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" required>
-                        @error('title')
-                            <span class="invalid-feedback">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    
-                    <div class="form-group mt-3">
-                        <label for="excerpt">Excerpt</label>
-                        <textarea name="excerpt" id="excerpt" class="form-control @error('excerpt') is-invalid @enderror" rows="3">{{ old('excerpt') }}</textarea>
-                        @error('excerpt')
-                            <span class="invalid-feedback">{{ $message }}</span>
-                        @enderror
-                        <small class="text-muted">A short summary of the post (optional)</small>
-                    </div>
-                    
-                    <div class="form-group mt-3">
-                        <label for="content">Content</label>
-                        <textarea name="content" id="content" class="form-control @error('content') is-invalid @enderror" rows="10">{{ old('content') }}</textarea>
-                        @error('content')
-                            <span class="invalid-feedback">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div class="card mt-4">
-                    <div class="card-header">
-                        <h4>SEO Settings</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label for="seo_title">SEO Title</label>
-                            <input type="text" name="seo_title" id="seo_title" class="form-control @error('seo_title') is-invalid @enderror" value="{{ old('seo_title') }}">
-                            @error('seo_title')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                            <small class="form-text text-muted">Title used in search engine results (recommended length: 50-60 characters). If left empty, the post title will be used.</small>
-                            <div id="seo-title-char-count" class="text-muted mt-1">
-                                Character count: <span>0</span>/60
-                            </div>
+                    <!-- Tabbed language sections for title, excerpt, and content -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <ul class="nav nav-tabs card-header-tabs" id="language-tabs" role="tablist">
+                                @foreach($languages as $index => $language)
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
+                                                id="{{ $language->code }}-tab" 
+                                                data-bs-toggle="tab" 
+                                                data-bs-target="#{{ $language->code }}-content" 
+                                                type="button" 
+                                                role="tab" 
+                                                aria-controls="{{ $language->code }}-content" 
+                                                aria-selected="{{ $index === 0 ? 'true' : 'false' }}">
+                                            {{ $language->name }}
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
-                        
-                        <div class="form-group mt-3">
-                            <label for="seo_description">SEO Description</label>
-                            <textarea name="seo_description" id="seo_description" class="form-control @error('seo_description') is-invalid @enderror" rows="3">{{ old('seo_description') }}</textarea>
-                            @error('seo_description')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                            <small class="form-text text-muted">Description used in search engine results (recommended length: 150-160 characters). If left empty, the post excerpt will be used.</small>
-                            <div id="seo-description-char-count" class="text-muted mt-1">
-                                Character count: <span>0</span>/160
+                        <div class="card-body">
+                            <div class="tab-content" id="language-content">
+                                @foreach($languages as $index => $language)
+                                    <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" 
+                                         id="{{ $language->code }}-content" 
+                                         role="tabpanel" 
+                                         aria-labelledby="{{ $language->code }}-tab">
+                                        
+                                        <div class="form-group">
+                                            <label for="title-{{ $language->code }}">Post Title ({{ $language->name }})</label>
+                                            <input type="text" 
+                                                   name="title[{{ $language->code }}]" 
+                                                   id="title-{{ $language->code }}" 
+                                                   class="form-control @error('title.'.$language->code) is-invalid @enderror" 
+                                                   value="{{ old('title.'.$language->code) }}" 
+                                                   {{ $language->is_default ? 'required' : '' }}>
+                                            @error('title.'.$language->code)
+                                                <span class="invalid-feedback">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        
+                                        <div class="form-group mt-3">
+                                            <label for="excerpt-{{ $language->code }}">Excerpt ({{ $language->name }})</label>
+                                            <textarea 
+                                                name="excerpt[{{ $language->code }}]" 
+                                                id="excerpt-{{ $language->code }}" 
+                                                class="form-control @error('excerpt.'.$language->code) is-invalid @enderror" 
+                                                rows="3">{{ old('excerpt.'.$language->code) }}</textarea>
+                                            @error('excerpt.'.$language->code)
+                                                <span class="invalid-feedback">{{ $message }}</span>
+                                            @enderror
+                                            <small class="text-muted">A short summary of the post (optional)</small>
+                                        </div>
+                                        
+                                        <div class="form-group mt-3">
+                                            <label for="content-{{ $language->code }}">Content ({{ $language->name }})</label>
+                                            <textarea 
+                                                name="content[{{ $language->code }}]" 
+                                                id="content-{{ $language->code }}" 
+                                                class="summernote form-control @error('content.'.$language->code) is-invalid @enderror" 
+                                                rows="10">{{ old('content.'.$language->code) }}</textarea>
+                                            @error('content.'.$language->code)
+                                                <span class="invalid-feedback">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        
+                                        <!-- SEO Fields by language -->
+                                        <div class="card mt-4">
+                                            <div class="card-header">
+                                                <h4>SEO Settings ({{ $language->name }})</h4>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="seo_title-{{ $language->code }}">SEO Title ({{ $language->name }})</label>
+                                                    <input type="text" 
+                                                           name="seo_title[{{ $language->code }}]" 
+                                                           id="seo_title-{{ $language->code }}" 
+                                                           class="form-control @error('seo_title.'.$language->code) is-invalid @enderror" 
+                                                           value="{{ old('seo_title.'.$language->code) }}">
+                                                    @error('seo_title.'.$language->code)
+                                                        <span class="invalid-feedback">{{ $message }}</span>
+                                                    @enderror
+                                                    <small class="form-text text-muted">Title used in search engine results (recommended length: 50-60 characters). If left empty, the post title will be used.</small>
+                                                    <div id="seo-title-char-count-{{ $language->code }}" class="text-muted mt-1">
+                                                        Character count: <span>0</span>/60
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group mt-3">
+                                                    <label for="seo_description-{{ $language->code }}">SEO Description ({{ $language->name }})</label>
+                                                    <textarea 
+                                                        name="seo_description[{{ $language->code }}]" 
+                                                        id="seo_description-{{ $language->code }}" 
+                                                        class="form-control @error('seo_description.'.$language->code) is-invalid @enderror" 
+                                                        rows="3">{{ old('seo_description.'.$language->code) }}</textarea>
+                                                    @error('seo_description.'.$language->code)
+                                                        <span class="invalid-feedback">{{ $message }}</span>
+                                                    @enderror
+                                                    <small class="form-text text-muted">Description used in search engine results (recommended length: 150-160 characters). If left empty, the post excerpt will be used.</small>
+                                                    <div id="seo-description-char-count-{{ $language->code }}" class="text-muted mt-1">
+                                                        Character count: <span>0</span>/160
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group mt-3">
+                                                    <label for="author_name-{{ $language->code }}">Author Name ({{ $language->name }})</label>
+                                                    <input type="text" 
+                                                           name="author_name[{{ $language->code }}]" 
+                                                           id="author_name-{{ $language->code }}" 
+                                                           class="form-control @error('author_name.'.$language->code) is-invalid @enderror" 
+                                                           value="{{ old('author_name.'.$language->code) }}">
+                                                    @error('author_name.'.$language->code)
+                                                        <span class="invalid-feedback">{{ $message }}</span>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
                 </div>
-                </div>
-
                 
                 <div class="col-md-4">
                     <div class="form-group" style="display: none;">
@@ -94,7 +161,7 @@
                             <option value="">Select Category</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
+                                    {{ $category->getTranslation('name', app()->getLocale(), false) }}
                                 </option>
                             @endforeach
                         </select>
@@ -104,21 +171,10 @@
                     </div>
 
                     <div class="form-group mt-3">
-                        <label for="author_name">Author Name</label>
-                        <input type="text" name="author_name" id="author_name" 
-                               class="form-control @error('author_name') is-invalid @enderror" 
-                               value="{{ old('author_name', $post->author_name ?? '') }}" placeholder="Optional author name">
-                        @error('author_name')
-                            <span class="invalid-feedback">{{ $message }}</span>
-                        @enderror
-                        <small class="text-muted">Leave empty for no author display</small>
-                    </div>
-
-                    <div class="form-group mt-3">
                         <label for="author_link">Author Link</label>
                         <input type="text" name="author_link" id="author_link" 
                                class="form-control @error('author_link') is-invalid @enderror" 
-                               value="{{ old('author_link', $post->author_link ?? '') }}" placeholder="https://...">
+                               value="{{ old('author_link') }}" placeholder="https://...">
                         @error('author_link')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
@@ -129,11 +185,7 @@
                         <label for="featured_image">Featured Image</label>
                         
                         <!-- Current image display (if any) -->
-                        <div id="image-preview" class="mb-2">
-                            @if(isset($post) && $post->featured_image)
-                                <img src="{{ asset($post->featured_image) }}" alt="Current Image" style="max-height: 150px;">
-                            @endif
-                        </div>
+                        <div id="image-preview" class="mb-2"></div>
                         
                         <!-- File upload control -->
                         <div class="input-group">
@@ -146,7 +198,7 @@
                         <!-- Hidden input to store the image path -->
                         <input type="hidden" name="featured_image" id="featured_image" 
                                class="form-control mt-2 @error('featured_image') is-invalid @enderror" 
-                               value="{{ isset($post) ? old('featured_image', $post->featured_image) : old('featured_image') }}">
+                               value="{{ old('featured_image') }}">
                         
                         @error('featured_image')
                             <span class="invalid-feedback">{{ $message }}</span>
@@ -181,19 +233,21 @@
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Initialize Summernote editor
-        $('#content').summernote({
-            height: 400,
-            toolbar: [
-                ['style', ['style']],
-                ['font', ['bold', 'italic', 'underline', 'clear']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['table', ['table']],
-                ['insert', ['link', 'picture', 'video']],
-                ['view', ['fullscreen', 'codeview', 'help']],
-            ]
-        });
+        // Initialize Summernote editor for each language tab
+        @foreach($languages as $language)
+            $('#content-{{ $language->code }}').summernote({
+                height: 400,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['fullscreen', 'codeview', 'help']],
+                ]
+            });
+        @endforeach
         
         // Handle image upload
         $('#image').on('change', function() {
@@ -224,37 +278,49 @@
                 }
             });
         });
+        
+        // Activate Bootstrap tabs
+        var triggerTabList = [].slice.call(document.querySelectorAll('#language-tabs button'))
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault()
+                tabTrigger.show()
+            })
+        });
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-        const seoTitle = document.getElementById('seo_title');
-        const seoDescription = document.getElementById('seo_description');
-        const titleCharCount = document.querySelector('#seo-title-char-count span');
-        const descriptionCharCount = document.querySelector('#seo-description-char-count span');
-        
-        // Update character count for title
-        if (seoTitle && titleCharCount) {
-            seoTitle.addEventListener('input', function() {
-                titleCharCount.textContent = this.value.length;
-                if (this.value.length > 60) {
-                    titleCharCount.classList.add('text-danger');
-                } else {
-                    titleCharCount.classList.remove('text-danger');
-                }
-            });
-        }
-        
-        // Update character count for description
-        if (seoDescription && descriptionCharCount) {
-            seoDescription.addEventListener('input', function() {
-                descriptionCharCount.textContent = this.value.length;
-                if (this.value.length > 160) {
-                    descriptionCharCount.classList.add('text-danger');
-                } else {
-                    descriptionCharCount.classList.remove('text-danger');
-                }
-            });
-        }
+        // SEO character counters for each language
+        @foreach($languages as $language)
+            const seoTitle_{{ $language->code }} = document.getElementById('seo_title-{{ $language->code }}');
+            const seoDescription_{{ $language->code }} = document.getElementById('seo_description-{{ $language->code }}');
+            const titleCharCount_{{ $language->code }} = document.querySelector('#seo-title-char-count-{{ $language->code }} span');
+            const descriptionCharCount_{{ $language->code }} = document.querySelector('#seo-description-char-count-{{ $language->code }} span');
+            
+            if (seoTitle_{{ $language->code }} && titleCharCount_{{ $language->code }}) {
+                seoTitle_{{ $language->code }}.addEventListener('input', function() {
+                    titleCharCount_{{ $language->code }}.textContent = this.value.length;
+                    if (this.value.length > 60) {
+                        titleCharCount_{{ $language->code }}.classList.add('text-danger');
+                    } else {
+                        titleCharCount_{{ $language->code }}.classList.remove('text-danger');
+                    }
+                });
+            }
+            
+            if (seoDescription_{{ $language->code }} && descriptionCharCount_{{ $language->code }}) {
+                seoDescription_{{ $language->code }}.addEventListener('input', function() {
+                    descriptionCharCount_{{ $language->code }}.textContent = this.value.length;
+                    if (this.value.length > 160) {
+                        descriptionCharCount_{{ $language->code }}.classList.add('text-danger');
+                    } else {
+                        descriptionCharCount_{{ $language->code }}.classList.remove('text-danger');
+                    }
+                });
+            }
+        @endforeach
     });
 </script>
 @endsection

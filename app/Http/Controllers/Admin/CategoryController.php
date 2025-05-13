@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Models\Language;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
@@ -23,7 +24,8 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('admin.categories.create');
+        $languages = active_languages();
+        return view('admin.categories.create', compact('languages'));
     }
 
     /**
@@ -31,27 +33,48 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:categories',
-            'description' => 'nullable|string',
-        ]);
+        $languages = active_languages();
+        $defaultLanguage = default_language();
         
-        // Generate slug from name
-        $slug = Str::slug($request->name);
-        $originalSlug = $slug;
-        $count = 1;
+        $rules = [];
+        foreach ($languages as $language) {
+            $isRequired = $language->is_default;
+            $rules["name.{$language->code}"] = $isRequired ? 'required|string|max:255' : 'nullable|string|max:255';
+            $rules["description.{$language->code}"] = 'nullable|string';
+        }
+        
+        $request->validate($rules);
+        
+        $category = new Category();
+        
+        // Set translatable fields
+        foreach ($languages as $language) {
+            $locale = $language->code;
+            
+            if (isset($request->name[$locale])) {
+                $category->setTranslation('name', $locale, $request->name[$locale]);
+            }
+            
+            if (isset($request->description[$locale])) {
+                $category->setTranslation('description', $locale, $request->description[$locale]);
+            }
+        }
+        
+        // Generate slug from default language name
+        $defaultLocale = $defaultLanguage->code;
+        $name = $request->name[$defaultLocale];
+        $slug = Str::slug($name);
         
         // Ensure the slug is unique
+        $originalSlug = $slug;
+        $count = 1;
         while (Category::where('slug', $slug)->exists()) {
             $slug = $originalSlug . '-' . $count;
             $count++;
         }
         
-        Category::create([
-            'name' => $request->name,
-            'slug' => $slug,
-            'description' => $request->description,
-        ]);
+        $category->slug = $slug;
+        $category->save();
         
         return redirect()->route('categories.index')
             ->with('success', 'Category created successfully.');
@@ -62,7 +85,8 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        return view('admin.categories.edit', compact('category'));
+        $languages = active_languages();
+        return view('admin.categories.edit', compact('category', 'languages'));
     }
 
     /**
@@ -70,18 +94,42 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
-            'description' => 'nullable|string',
-        ]);
+        $languages = active_languages();
+        $defaultLanguage = default_language();
         
-        // If name changed, update slug
-        if ($category->name != $request->name) {
-            $slug = Str::slug($request->name);
-            $originalSlug = $slug;
-            $count = 1;
+        $rules = [];
+        foreach ($languages as $language) {
+            $isRequired = $language->is_default;
+            $rules["name.{$language->code}"] = $isRequired ? 'required|string|max:255' : 'nullable|string|max:255';
+            $rules["description.{$language->code}"] = 'nullable|string';
+        }
+        
+        $request->validate($rules);
+        
+        // Update translatable fields
+        foreach ($languages as $language) {
+            $locale = $language->code;
+            
+            if (isset($request->name[$locale])) {
+                $category->setTranslation('name', $locale, $request->name[$locale]);
+            }
+            
+            if (isset($request->description[$locale])) {
+                $category->setTranslation('description', $locale, $request->description[$locale]);
+            }
+        }
+        
+        // If name changed in default language, update slug
+        $defaultLocale = $defaultLanguage->code;
+        $newName = $request->name[$defaultLocale];
+        $oldName = $category->getTranslation('name', $defaultLocale, false);
+        
+        if ($newName != $oldName) {
+            $slug = Str::slug($newName);
             
             // Ensure the slug is unique
+            $originalSlug = $slug;
+            $count = 1;
             while (Category::where('slug', $slug)->where('id', '!=', $category->id)->exists()) {
                 $slug = $originalSlug . '-' . $count;
                 $count++;
@@ -90,8 +138,6 @@ class CategoryController extends Controller
             $category->slug = $slug;
         }
         
-        $category->name = $request->name;
-        $category->description = $request->description;
         $category->save();
         
         return redirect()->route('categories.index')

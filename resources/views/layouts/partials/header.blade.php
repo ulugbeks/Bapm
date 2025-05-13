@@ -71,6 +71,8 @@
               </ul>
             </div>
             <div class="header-right d-flex align-items-center justify-content-end">
+              <!-- Language switcher -->
+              @include('layouts.partials.language-switcher')
               <div class="social-icons mx-4">
                 <ul class="list-inline">
                   <li>

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Post extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     protected $fillable = [
         'title',
@@ -21,6 +22,15 @@ class Post extends Model
         'active',
         'author_name',
         'author_link',
+    ];
+
+    public $translatable = [
+        'title',
+        'seo_title',
+        'seo_description',
+        'excerpt',
+        'content',
+        'author_name'
     ];
 
     public function category()

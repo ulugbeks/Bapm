@@ -1,4 +1,3 @@
-<!-- admin/services/create.blade.php -->
 @extends('admin.layouts.app')
 
 @section('title', 'Create Service')
@@ -18,30 +17,76 @@
     <div class="card-body">
         <form action="{{ route('services.store') }}" method="POST">
             @csrf
-            <div class="form-group">
-                <label for="title">Title</label>
-                <input type="text" name="title" id="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" required>
-                @error('title')
-                    <span class="invalid-feedback">{{ $message }}</span>
-                @enderror
+            
+            <!-- Translatable fields -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="language-tabs" role="tablist">
+                        @foreach($languages as $index => $language)
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
+                                        id="{{ $language->code }}-tab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#{{ $language->code }}-content" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="{{ $language->code }}-content" 
+                                        aria-selected="{{ $index === 0 ? 'true' : 'false' }}">
+                                    {{ $language->name }}
+                                </button>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="language-content">
+                        @foreach($languages as $index => $language)
+                            <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" 
+                                 id="{{ $language->code }}-content" 
+                                 role="tabpanel" 
+                                 aria-labelledby="{{ $language->code }}-tab">
+                                
+                                <div class="form-group">
+                                    <label for="title-{{ $language->code }}">Title ({{ $language->name }})</label>
+                                    <input type="text" 
+                                           name="title[{{ $language->code }}]" 
+                                           id="title-{{ $language->code }}" 
+                                           class="form-control @error('title.'.$language->code) is-invalid @enderror" 
+                                           value="{{ old('title.'.$language->code) }}" 
+                                           {{ $language->is_default ? 'required' : '' }}>
+                                    @error('title.'.$language->code)
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                
+                                <div class="form-group mt-3">
+                                    <label for="description-{{ $language->code }}">Short Description ({{ $language->name }})</label>
+                                    <textarea name="description[{{ $language->code }}]" 
+                                              id="description-{{ $language->code }}" 
+                                              class="form-control @error('description.'.$language->code) is-invalid @enderror" 
+                                              rows="3">{{ old('description.'.$language->code) }}</textarea>
+                                    @error('description.'.$language->code)
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                
+                                <div class="form-group mt-3">
+                                    <label for="content-{{ $language->code }}">Full Content ({{ $language->name }})</label>
+                                    <textarea name="content[{{ $language->code }}]" 
+                                              id="content-{{ $language->code }}" 
+                                              class="form-control content-editor @error('content.'.$language->code) is-invalid @enderror" 
+                                              rows="6">{{ old('content.'.$language->code) }}</textarea>
+                                    @error('content.'.$language->code)
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
             
-            <div class="form-group">
-                <label for="description">Short Description</label>
-                <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" rows="3">{{ old('description') }}</textarea>
-                @error('description')
-                    <span class="invalid-feedback">{{ $message }}</span>
-                @enderror
-            </div>
-            
-            <div class="form-group">
-                <label for="content">Full Content</label>
-                <textarea name="content" id="content" class="form-control @error('content') is-invalid @enderror" rows="6">{{ old('content') }}</textarea>
-                @error('content')
-                    <span class="invalid-feedback">{{ $message }}</span>
-                @enderror
-            </div>
-            
+            <!-- Non-translatable fields -->
             <div class="form-group">
                 <label for="icon">Icon Class</label>
                 <input type="text" name="icon" id="icon" class="form-control @error('icon') is-invalid @enderror" value="{{ old('icon') }}" placeholder="flaticon flaticon-biochemistry">
@@ -100,18 +145,32 @@
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#content').summernote({
-            height: 300,
-            toolbar: [
-                ['style', ['style']],
-                ['font', ['bold', 'italic', 'underline', 'clear']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['table', ['table']],
-                ['insert', ['link', 'hr']],
-                ['view', ['fullscreen', 'codeview']]
-            ]
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Bootstrap tabs
+        var triggerTabList = [].slice.call(document.querySelectorAll('#language-tabs button'))
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault()
+                tabTrigger.show()
+            })
+        })
+        
+        // Initialize Summernote editors
+        $('.content-editor').each(function() {
+            $(this).summernote({
+                height: 300,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'hr']],
+                    ['view', ['fullscreen', 'codeview']]
+                ]
+            });
         });
     });
 </script>

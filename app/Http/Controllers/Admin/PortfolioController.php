@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Portfolio;
+use App\Models\Language;
 
 class PortfolioController extends Controller
 {
@@ -16,21 +17,56 @@ class PortfolioController extends Controller
 
     public function create()
     {
-        return view('admin.portfolio.create');
+        $languages = active_languages();
+        return view('admin.portfolio.create', compact('languages'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
-            'description' => 'nullable|string',
+        $languages = active_languages();
+        $defaultLanguage = default_language();
+        
+        $rules = [];
+        foreach ($languages as $language) {
+            $isRequired = $language->is_default;
+            $rules["title.{$language->code}"] = $isRequired ? 'required|string|max:255' : 'nullable|string|max:255';
+            $rules["category.{$language->code}"] = $isRequired ? 'required|string|max:255' : 'nullable|string|max:255';
+            $rules["description.{$language->code}"] = 'nullable|string';
+        }
+        
+        $rules = array_merge($rules, [
             'image' => 'required|string|max:255',
             'order' => 'nullable|integer',
             'active' => 'nullable|boolean',
         ]);
 
-        Portfolio::create($request->all());
+        $request->validate($rules);
+        
+        $portfolio = new Portfolio();
+        
+        // Set translatable fields
+        foreach ($languages as $language) {
+            $locale = $language->code;
+            
+            if (isset($request->title[$locale])) {
+                $portfolio->setTranslation('title', $locale, $request->title[$locale]);
+            }
+            
+            if (isset($request->category[$locale])) {
+                $portfolio->setTranslation('category', $locale, $request->category[$locale]);
+            }
+            
+            if (isset($request->description[$locale])) {
+                $portfolio->setTranslation('description', $locale, $request->description[$locale]);
+            }
+        }
+        
+        // Set non-translatable fields
+        $portfolio->image = $request->image;
+        $portfolio->order = $request->order ?? 0;
+        $portfolio->active = $request->has('active') ? 1 : 0;
+        
+        $portfolio->save();
 
         return redirect()->route('portfolio.index')
             ->with('success', 'Portfolio item created successfully.');
@@ -38,21 +74,54 @@ class PortfolioController extends Controller
 
     public function edit(Portfolio $portfolio)
     {
-        return view('admin.portfolio.edit', compact('portfolio'));
+        $languages = active_languages();
+        return view('admin.portfolio.edit', compact('portfolio', 'languages'));
     }
 
     public function update(Request $request, Portfolio $portfolio)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
-            'description' => 'nullable|string',
+        $languages = active_languages();
+        $defaultLanguage = default_language();
+        
+        $rules = [];
+        foreach ($languages as $language) {
+            $isRequired = $language->is_default;
+            $rules["title.{$language->code}"] = $isRequired ? 'required|string|max:255' : 'nullable|string|max:255';
+            $rules["category.{$language->code}"] = $isRequired ? 'required|string|max:255' : 'nullable|string|max:255';
+            $rules["description.{$language->code}"] = 'nullable|string';
+        }
+        
+        $rules = array_merge($rules, [
             'image' => 'required|string|max:255',
             'order' => 'nullable|integer',
             'active' => 'nullable|boolean',
         ]);
 
-        $portfolio->update($request->all());
+        $request->validate($rules);
+        
+        // Update translatable fields
+        foreach ($languages as $language) {
+            $locale = $language->code;
+            
+            if (isset($request->title[$locale])) {
+                $portfolio->setTranslation('title', $locale, $request->title[$locale]);
+            }
+            
+            if (isset($request->category[$locale])) {
+                $portfolio->setTranslation('category', $locale, $request->category[$locale]);
+            }
+            
+            if (isset($request->description[$locale])) {
+                $portfolio->setTranslation('description', $locale, $request->description[$locale]);
+            }
+        }
+        
+        // Update non-translatable fields
+        $portfolio->image = $request->image;
+        $portfolio->order = $request->order;
+        $portfolio->active = $request->has('active') ? 1 : 0;
+        
+        $portfolio->save();
 
         return redirect()->route('portfolio.index')
             ->with('success', 'Portfolio item updated successfully.');

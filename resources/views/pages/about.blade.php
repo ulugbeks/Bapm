@@ -9,15 +9,15 @@
     <div class="row">
       <div class="col-lg-6">
         <h1>
-          About Us
+          {{ __('About Us') }}
         </h1>
         <nav aria-label="breadcrumb" class="page-breadcrumb">
           <ol class="breadcrumb">
             <li class="breadcrumb-item">
               <a href="{{ route('home') }}">
-                <i class="bi bi-house-door me-1"></i>Home</a>
+                <i class="bi bi-house-door me-1"></i>{{ __('Home') }}</a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">About Us</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ __('About Us') }}</li>
           </ol>
         </nav>
       </div>
@@ -36,9 +36,9 @@
       </div>
       <div class="col-lg-6 col-md-12 mt-8 mt-lg-0">
         <div class="theme-title">
-          <h6>{{ $about->subtitle ?? 'What We Do' }}</h6>
-          <h2>{!! $about->title ?? 'Strong Values That Bring <span>Great People Together.</span>' !!}</h2>
-          <p>{{ $about->description ?? 'We redefine the boundaries of scientific exploration Our state-of-the-art laboratory and dedicated research teams are committed to advancing knowledge.' }}</p>
+          <h6>{{ t($about, 'subtitle', app()->getLocale()) ?? __('What We Do') }}</h6>
+          <h2>{!! t($about, 'title', app()->getLocale()) ?? __('Strong Values That Bring <span>Great People Together.</span>') !!}</h2>
+          <p>{{ t($about, 'description', app()->getLocale()) ?? __('We redefine the boundaries of scientific exploration Our state-of-the-art laboratory and dedicated research teams are committed to advancing knowledge.') }}</p>
         </div>
         @if(!empty($about_features ?? []))
           @foreach($about_features as $feature)
@@ -48,9 +48,9 @@
             </div>
             <div class="featured-desc">
               <div class="featured-title">
-                <h4>{{ $feature->title }}</h4>
+                <h4>{{ t($feature, 'title', app()->getLocale()) }}</h4>
               </div>
-              <p>{{ $feature->description }}</p>
+              <p>{{ t($feature, 'description', app()->getLocale()) }}</p>
             </div>
           </div>
           @endforeach
@@ -67,8 +67,8 @@
     <div class="row align-items-center">
       <div class="col-lg-12 col-md-12 mt-8 mt-lg-0">
         <div class="theme-title">
-          <h3>{{ $about->additional_title ?? 'Strong Values That Bring' }}</h3>
-          <p>{{ $about->additional_description ?? 'We redefine the boundaries of scientific exploration Our state-of-the-art laboratory and dedicated research teams are committed to advancing knowledge.' }}</p>
+          <h3>{{ t($about, 'additional_title', app()->getLocale()) ?? __('Strong Values That Bring') }}</h3>
+          <p>{{ t($about, 'additional_description', app()->getLocale()) ?? __('We redefine the boundaries of scientific exploration Our state-of-the-art laboratory and dedicated research teams are committed to advancing knowledge.') }}</p>
         </div>
       </div>
     </div>
@@ -93,8 +93,8 @@
               <i class="{{ $item->icon }}"></i>
             </div>
             <div class="timeline-content {{ $loop->index % 2 == 0 ? 'timeline-order-3b' : 'timeline-order-3' }} col-md">
-              <h4>{{ $item->title }}</h4>
-              <p>{{ $item->description }}</p>
+              <h4>{{ t($item, 'title', app()->getLocale()) }}</h4>
+              <p>{{ t($item, 'description', app()->getLocale()) }}</p>
             </div>
           </div>
           @endforeach

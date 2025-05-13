@@ -3,23 +3,20 @@
     <div class="container">
       <div class="row align-items-center footer-top">
         <div class="col-lg-6">
-          <h2 class="text-white mb-0">{{ $settings->footer_cta_title ?? 'Need help on Emergency? Book Your Appointment Today.' }}</h2>
+          <h2 class="text-white mb-0">{{ t($settings, 'footer_cta_title', app()->getLocale()) ?? 'Need help on Emergency? Book Your Appointment Today.' }}</h2>
         </div>
         <div class="col-lg-6 text-lg-end mt-4 mt-lg-0">
-          <a href="{{ route('contact') }}" class="themeht-btn primary-btn">Contacts</a>
+          <a href="{{ route('contact') }}" class="themeht-btn primary-btn">{{ __('Contacts') }}</a>
           <a href="tel:{{ $settings->phone ?? '(123) 456-7890' }}" class="themeht-btn white-btn ms-3">{{ $settings->phone ?? '(123) 456-7890' }}</a>
         </div>
       </div>
       <div class="footer-btm">
         <div class="row">
           <div class="col-lg-4 pe-lg-8">
-            <!-- <a class="navbar-brand logo footer-logo mb-4 d-inline-block" href="{{ route('home') }}">
-              <img class="img-fluid" src="{{ asset('images/logo-white.svg') }}" alt="">
-            </a> -->
             <ul class="media-icon list-unstyled">
               <li>
                 <i class="flaticon flaticon-location-1"></i>
-                <p class="mb-0">{{ $settings->address ?? '5th Street, 21st Floor, New York, USA' }}</p>
+                <p class="mb-0">{{ t($settings, 'address', app()->getLocale()) ?? '5th Street, 21st Floor, New York, USA' }}</p>
               </li>
               <li>
                 <i class="flaticon flaticon-envelope"></i>
@@ -34,35 +31,35 @@
           <div class="col-lg-8 mt-5 mt-lg-0">
             <div class="row">              
               <div class="col-md-3 footer-menu">
-                <h5>Quick Links</h5>
+                <h5>{{ __('Quick Links') }}</h5>
                 <ul class="list-unstyled w-100">
                   <li>
-                    <a href="#">Terms & Conditions</a>
+                    <a href="#">{{ __('Terms & Conditions') }}</a>
                   </li>
                   <li>
-                    <a href="#">Privacy Policy</a>
+                    <a href="#">{{ __('Privacy Policy') }}</a>
                   </li>
                   <li>
-                    <a href="#">Cookies</a>
+                    <a href="#">{{ __('Cookies') }}</a>
                   </li>
                 </ul>
               </div>
               <div class="col-md-3 mt-5 mt-md-0 footer-menu">
-                <h5>Our Services</h5>
+                <h5>{{ __('Our Services') }}</h5>
                 <ul class="list-unstyled">
                   @foreach($footerServices ?? [] as $service)
                   <li>
-                    <a href="#">{{ $service->title }}</a>
+                    <a href="#">{{ t($service, 'title', app()->getLocale()) }}</a>
                   </li>
                   @endforeach
                 </ul>
               </div>
               <div class="col-md-6 mt-5 mt-md-0 ps-lg-8 footer-subscribe">
-                <h5>Newsletter</h5>
-                <p>{{ $settings->newsletter_text ?? 'Subscribe to our newsletter to get the latest updates.' }}</p>
+                <h5>{{ __('Newsletter') }}</h5>
+                <p>{{ t($settings, 'newsletter_text', app()->getLocale()) ?? 'Subscribe to our newsletter to get the latest updates.' }}</p>
                 <form action="{{ route('newsletter.subscribe') }}" method="post" class="subscribe-form">
                   @csrf
-                  <input type="email" name="email" class="email" placeholder="Email Address" required="">
+                  <input type="email" name="email" class="email" placeholder="{{ __('Email Address') }}" required="">
                   <button type="submit" value="Sign up">
                     <i class="bi bi-send-fill"></i>
                   </button>
@@ -73,7 +70,7 @@
         </div>
         <div class="secondary-footer">
           <div class="row">
-            <div class="col-lg-7 copyright">Copyright {{ date('Y') }}. {{ $settings->site_name ?? 'Your Site' }}. All Rights Reserved</div>
+            <div class="col-lg-7 copyright">{{ __('Copyright') }} {{ date('Y') }}. {{ t($settings, 'site_name', app()->getLocale()) ?? 'Your Site' }}. {{ __('All Rights Reserved') }}</div>
             <div class="col-lg-5 text-lg-end mt-4 mt-lg-0">
               <ul class="list-inline ps-0 ms-0 mb-0 footer-social social-icons">
                 <li class="list-inline-item">

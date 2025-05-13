@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Slider extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     protected $fillable = [
         'title',
@@ -20,5 +21,13 @@ class Slider extends Model
         'secondary_button_url',
         'order',
         'active',
+    ];
+
+    public $translatable = [
+        'title',
+        'subtitle',
+        'description',
+        'primary_button_text',
+        'secondary_button_text'
     ];
 }
